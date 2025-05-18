@@ -31,7 +31,6 @@ public class BeastsLairEvent extends Colosseum {
     public static final String IMG = SpireAnniversary6Mod.makeImagePath("events/eventpicture.png");
 
     private CurScreen screen;
-    String encounter;
 
     public BeastsLairEvent() {
         super();
@@ -56,6 +55,7 @@ public class BeastsLairEvent extends Colosseum {
                 switch (buttonPressed) {
                     case 0:
                         this.screen = CurScreen.LEAVE;
+                        String encounter = BeastsLairZone.bossList.get(0);
                         AbstractDungeon.getCurrRoom().monsters = MonsterHelper.getEncounter(encounter);
                         AbstractDungeon.getCurrRoom().rewards.clear();
                         AbstractDungeon.getCurrRoom().rewardAllowed = true;
@@ -67,9 +67,9 @@ public class BeastsLairEvent extends Colosseum {
                         this.enterCombatFromImage();
                         // boss buff
                         for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
-                            m.maxHealth = (int) (m.maxHealth * 1.25f);
-                            m.currentHealth = (int) (m.currentHealth * 1.25f);
-                            AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, AbstractDungeon.player, new ArtifactPower(m, 2)));
+                            // m.maxHealth = (int) (m.maxHealth * 1.25f);
+                            // m.currentHealth = (int) (m.currentHealth * 1.25f);
+                            // AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, AbstractDungeon.player, new ArtifactPower(m, 2)));
                             // AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, AbstractDungeon.player, new FuryPower(m, 10)));
                         }
                         AbstractDungeon.lastCombatMetricKey = encounter;

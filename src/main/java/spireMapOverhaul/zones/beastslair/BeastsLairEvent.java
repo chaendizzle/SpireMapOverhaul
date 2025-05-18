@@ -33,7 +33,7 @@ public class BeastsLairEvent extends Colosseum {
     private CurScreen screen;
     String encounter;
 
-    public BeastsLairEvent(String encounter) {
+    public BeastsLairEvent() {
         super();
         this.imageEventText.clear();
         this.roomEventText.clear();
@@ -42,7 +42,6 @@ public class BeastsLairEvent extends Colosseum {
         this.imageEventText.loadImage(IMG);
         type = EventType.IMAGE;
         this.noCardsInRewards = false;
-        this.encounter = encounter;
 
         this.screen = CurScreen.INTRO;
         this.imageEventText.setDialogOption(OPTIONS[0]);

@@ -77,7 +77,8 @@ public class BeastsLairZone extends AbstractZone implements EncounterModifyingZo
         for (MapRoomNode node : nodes) {
             node.setRoom(new ForcedEventRoom(() -> {
                 AbstractEvent eventInfo = EventUtils.getEvent(BeastsLairEvent.ID);
-                BeastsLairEvent event = new BeastsLairEvent(bossList.get(rng.random(bossList.size() - 1)));
+                BeastsLairEvent event = new BeastsLairEvent();
+                event.encounter = bossList.get(rng.random(bossList.size() - 1));
                 AdditionalEventParameters.additionalParameters.set(event, AdditionalEventParameters.additionalParameters.get(eventInfo));
                 return event;
             }));

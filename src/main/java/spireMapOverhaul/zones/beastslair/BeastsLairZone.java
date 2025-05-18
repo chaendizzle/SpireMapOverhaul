@@ -76,14 +76,6 @@ public class BeastsLairZone extends AbstractZone implements EncounterModifyingZo
     public void manualRoomPlacement(Random rng) {
         for (MapRoomNode node : nodes) {
             node.setRoom(new ForcedEventRoom(() -> {
-                // Because Beast's Lair needs a constructor parameter, we can't use the event we get back from EventUtils
-                // directly (since it instantiates a new instance with the parameterless constructor)
-                // It also isn't enough to make a new instance ourselves, since the only good way to properly set the
-                // additionalParameters SpireField that PhasedEvent relies on is to go through EventUtils
-                // So we grab the additionalParameters from the EventUtils instance, then attach them to our own instance
-                // Maybe there's a way to refactor BeastsLairEvent to not need a constructor parameter, but PhasedEvent
-                // makes it hard. The alternative would be to abandon PhasedEvent entirely and just extend Colosseum, like
-                // ThiefKingEvent does (which avoided all these problems).
                 AbstractEvent eventInfo = EventUtils.getEvent(BeastsLairEvent.ID);
                 BeastsLairEvent event = new BeastsLairEvent(bossList.get(rng.random(bossList.size() - 1)));
                 AdditionalEventParameters.additionalParameters.set(event, AdditionalEventParameters.additionalParameters.get(eventInfo));

@@ -2,86 +2,118 @@ package spireMapOverhaul.zones.characterinfluence;
 
 import basemod.BaseMod;
 import basemod.ReflectionHacks;
-import basemod.abstracts.events.PhasedEvent;
-import basemod.abstracts.events.phases.CombatPhase;
-import basemod.abstracts.events.phases.TextPhase;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.megacrit.cardcrawl.actions.common.LoseHPAction;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.GenericEventDialog;
+import com.megacrit.cardcrawl.events.city.Colosseum;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import com.megacrit.cardcrawl.helpers.MonsterHelper;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.localization.EventStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.rewards.RewardItem;
-import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import spireMapOverhaul.SpireAnniversary6Mod;
 
 import java.util.ArrayList;
 
-import static spireMapOverhaul.SpireAnniversary6Mod.makeID;
 import static spireMapOverhaul.zones.characterinfluence.CharacterInfluenceZone.getCurrentZoneCharacter;
 
-@SuppressWarnings("unused")
-public class CharacterInfluenceEvent extends PhasedEvent {
-    public static final String ID = makeID("CharacterVisit");
+// We extend the Colosseum event because ProceedButton.java specifically checks if an event is an instance of this type
+// (or a few other types) in the logic for what happens when you click proceed. This is easier than a patch.
+public class CharacterInfluenceEvent extends Colosseum {
+    public static final String ID = SpireAnniversary6Mod.makeID("CharacterVisit");
     private static final EventStrings eventStrings = CardCrawlGame.languagePack.getEventString(ID);
+    private static final String NAME = eventStrings.NAME;
     private static final String[] DESCRIPTIONS = eventStrings.DESCRIPTIONS;
     private static final String[] OPTIONS = eventStrings.OPTIONS;
-    private static final String title = eventStrings.NAME;
+    public static final String IMG = SpireAnniversary6Mod.makeImagePath("events/ShadowyFigure.png");
+
+    private CurScreen screen;
 
     public CharacterInfluenceEvent() {
-        super(ID, title, "images/events/ShadowyFigure.png");
+        super();
+        this.imageEventText.clear();
+        this.roomEventText.clear();
+        this.title = NAME;
+        this.body = DESCRIPTIONS[0] + DESCRIPTIONS[2] + DESCRIPTIONS[1];
+        this.imageEventText.loadImage(IMG);
+        setImage();
+        type = EventType.IMAGE;
+        this.noCardsInRewards = false;
 
-        setImage(); // If it can find a mod image, it uses that instead.
-
-        registerPhase("EventStart", new TextPhase(DESCRIPTIONS[0] + DESCRIPTIONS[2] + DESCRIPTIONS[1]) {
-            @Override
-            public String getBody() {
-                if (getCurrentZoneCharacter() != null) {
-                    return DESCRIPTIONS[0] + getCurrentZoneCharacter().title + DESCRIPTIONS[1];
-                } else {
-                    return super.getBody();
-                }
-            }
-        }.addOption(OPTIONS[0], (i)->transitionKey("Combat")).addOption(OPTIONS[1], (i)->this.openMap()));
-
-        registerPhase("Combat", new CombatPhase(AbstractDungeon.eliteMonsterList.remove(0)) {
-            //This is a slightly hacky fix for a bug with PhasedEvent; it incorrectly sets the room phase to incomplete
-            //even though this phase has no follow up and the event is intended to end with the combat rewards
-            //There's a BaseMod PR with a fix, so once BaseMod is updated and everyone has that update, we can remove this
-            //See https://github.com/daviscook477/BaseMod/pull/422
-            @Override
-            public boolean reopen(PhasedEvent phasedEvent) {
-                boolean b = super.reopen(phasedEvent);
-                AbstractDungeon.getCurrRoom().phase = AbstractRoom.RoomPhase.COMPLETE;
-                return b;
-            }
-        }.setType(AbstractMonster.EnemyType.ELITE).addRewards(true, (room)->{
-
-            //Adds all starting relics to the reward screen
-            ArrayList<String> relicStrings = new ArrayList<>();
-            if (getCurrentZoneCharacter() != null) {
-                relicStrings = getCurrentZoneCharacter().getStartingRelics();
-            }
-
-            for (String relicID : relicStrings) {
-                room.rewards.add(new RewardItem(RelicLibrary.getRelic(relicID).makeCopy()));
-            }
-
-        }));
-
-        transitionKey("EventStart"); //starting point
+        this.screen = CurScreen.INTRO;
+        this.imageEventText.setDialogOption(OPTIONS[0]);
+        this.imageEventText.setDialogOption(OPTIONS[1]);
+        if (getCurrentZoneCharacter() != null) {
+            this.body = DESCRIPTIONS[0] + getCurrentZoneCharacter().title + DESCRIPTIONS[1];
+        }
+        this.imageEventText.updateBodyText(this.body);
     }
 
     @Override
-    public void enterCombat() {
-        super.enterCombat();
-        for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
-            AbstractDungeon.actionManager.addToTop(new LoseHPAction(m, AbstractDungeon.player, m.currentHealth/4));
+    protected void buttonEffect(int buttonPressed) {
+        switch(this.screen) {
+            case INTRO:
+                AbstractDungeon.getCurrRoom().rewardAllowed = false;
+                switch (buttonPressed) {
+                    case 0:
+                        this.screen = CurScreen.LEAVE;
+                        String encounter = AbstractDungeon.eliteMonsterList.remove(0);
+                        AbstractDungeon.getCurrRoom().monsters = MonsterHelper.getEncounter(encounter);
+                        AbstractDungeon.getCurrRoom().rewards.clear();
+                        AbstractDungeon.getCurrRoom().rewardAllowed = true;
+                        //Adds all starting relics to the reward screen
+                        ArrayList<String> relicStrings = new ArrayList<>();
+                        if (getCurrentZoneCharacter() != null) {
+                            relicStrings = getCurrentZoneCharacter().getStartingRelics();
+                        }
+                        for (String relicID : relicStrings) {
+                            AbstractDungeon.getCurrRoom().rewards.add(new RewardItem(RelicLibrary.getRelic(relicID).makeCopy()));
+                        }
+                        AbstractDungeon.getCurrRoom().addPotionToRewards();
+                        AbstractDungeon.getCurrRoom().eliteTrigger = true;
+                        this.enterCombatFromImage();
+                        // start damaged
+                        for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+                            AbstractDungeon.actionManager.addToBottom(new LoseHPAction(m, m, m.currentHealth/4));
+                        }
+                        AbstractDungeon.lastCombatMetricKey = encounter;
+                        break;
+                    default:
+                        this.openMap();
+                        break;
+                }
+                break;
+            default:
+                this.openMap();
+                break;
         }
+    }
+
+    @Override
+    public void reopen() {
+        if (this.screen != CurScreen.LEAVE) {
+            AbstractDungeon.resetPlayer();
+            AbstractDungeon.player.drawX = (float) Settings.WIDTH * 0.25F;
+            AbstractDungeon.player.preBattlePrep();
+            this.enterImageFromCombat();
+            this.imageEventText.updateBodyText(DESCRIPTIONS[2]);
+            this.imageEventText.updateDialogOption(0, OPTIONS[2]);
+            this.imageEventText.setDialogOption(OPTIONS[3]);
+        }
+    }
+
+    private enum CurScreen {
+        INTRO,
+        FIGHT,
+        LEAVE,
+        FLED,
+        POST_COMBAT
     }
 
     // Sets the Event image to a cropped version of the character portrait.
@@ -137,9 +169,5 @@ public class CharacterInfluenceEvent extends PhasedEvent {
 
         pixmap.dispose();
 
-    }
-
-    public static boolean endsWithRewardsUI() {
-        return true;
     }
 }

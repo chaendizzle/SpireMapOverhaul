@@ -69,8 +69,8 @@ public class BeastsLairEvent extends Colosseum {
                         for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
                             m.maxHealth = (int) (m.maxHealth * 1.25f);
                             m.currentHealth = (int) (m.currentHealth * 1.25f);
-                            AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, null, new ArtifactPower(m, 2)));
-                            AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, null, new FuryPower(m, 10)));
+                            AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, AbstractDungeon.player, new ArtifactPower(m, 2)));
+                            AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, AbstractDungeon.player, new FuryPower(m, 10)));
                         }
                         AbstractDungeon.lastCombatMetricKey = encounter;
                         break;

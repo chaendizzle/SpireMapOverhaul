@@ -6,22 +6,30 @@ import basemod.eventUtil.EventUtils;
 import basemod.patches.com.megacrit.cardcrawl.events.AbstractEvent.AdditionalEventParameters;
 import com.badlogic.gdx.graphics.Color;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch2;
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.map.MapRoomNode;
+import com.megacrit.cardcrawl.powers.VulnerablePower;
+import com.megacrit.cardcrawl.powers.WeakPower;
 import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import spireMapOverhaul.abstracts.AbstractZone;
+import spireMapOverhaul.zoneInterfaces.CombatModifyingZone;
 import spireMapOverhaul.zoneInterfaces.EncounterModifyingZone;
 import spireMapOverhaul.zoneInterfaces.RewardModifyingZone;
+import spireMapOverhaul.zones.gravewoodGrove.powers.DeadBranchPower;
+import spireMapOverhaul.zones.invasion.powers.FixedTextDrawPower;
 import spireMapOverhaul.zones.thieveshideout.rooms.ForcedEventRoom;
 
 import java.util.ArrayList;
 
 import static spireMapOverhaul.SpireAnniversary6Mod.makeID;
+import static spireMapOverhaul.util.Wiz.adp;
+import static spireMapOverhaul.util.Wiz.atb;
 
-public class BeastsLairZone extends AbstractZone implements EncounterModifyingZone, RewardModifyingZone {
+public class BeastsLairZone extends AbstractZone implements CombatModifyingZone, EncounterModifyingZone, RewardModifyingZone {
     public static final String ID = "BeastsLair";
     public static final String SaveID = makeID("BeastsLairBosses");
     public static ArrayList<String> bossList = new ArrayList<>();
@@ -40,6 +48,11 @@ public class BeastsLairZone extends AbstractZone implements EncounterModifyingZo
         bossList.clear();
     }
 
+    @Override
+    public void atPreBattle() {
+        atb(new ApplyPowerAction(adp(), null, new VulnerablePower(adp(), 99, false)));
+        atb(new ApplyPowerAction(adp(), null, new WeakPower(adp(), 99, false)));
+    }
 
     public static void initializeSaveFields() {
         BaseMod.addSaveField(SaveID, new CustomSavable<ArrayList<String>>() {

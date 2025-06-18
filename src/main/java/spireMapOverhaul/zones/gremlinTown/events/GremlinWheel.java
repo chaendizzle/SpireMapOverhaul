@@ -10,8 +10,10 @@ import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.AbstractImageEvent;
 import com.megacrit.cardcrawl.events.GenericEventDialog;
+import com.megacrit.cardcrawl.events.city.Colosseum;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.MathHelper;
@@ -30,7 +32,7 @@ import static spireMapOverhaul.SpireAnniversary6Mod.makeID;
 import static spireMapOverhaul.SpireAnniversary6Mod.makeImagePath;
 import static spireMapOverhaul.util.Wiz.*;
 
-public class GremlinWheel extends AbstractImageEvent {
+public class GremlinWheel extends Colosseum {
     public static final String ID = makeID(GremlinWheel.class.getSimpleName());
     private static final EventStrings eventStrings;
     private static final String NAME;
@@ -96,7 +98,15 @@ public class GremlinWheel extends AbstractImageEvent {
     }
 
     public GremlinWheel() {
-        super(NAME, DESCRIPTIONS[0], IMAGE_PATH);
+        super();
+        this.imageEventText.clear();
+        this.roomEventText.clear();
+        this.title = NAME;
+        this.body = DESCRIPTIONS[0];
+        this.imageEventText.loadImage(IMAGE_PATH);
+        type = AbstractEvent.EventType.IMAGE;
+        this.noCardsInRewards = false;
+
         goldAmount = GOLD_BASE + AbstractDungeon.miscRng.random(0, GOLD_VARIANCE);
         screen = CUR_SCREEN.INTRO;
         startSpinFake = false;

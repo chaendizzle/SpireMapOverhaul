@@ -105,37 +105,4 @@ public class BeastsLairEvent extends Colosseum {
         FLED,
         POST_COMBAT
     }
-
-    @SpirePatch2(clz = SpawnMonsterAction.class, method = "update")
-    public static class SpawnMonsterActionPatch {
-        @SpireInsertPatch(locator = BeastsLairEvent.SpawnMonsterActionPatch.Locator.class)
-        public static void patch(SpawnMonsterAction __instance) {
-            boolean used = ReflectionHacks.getPrivate(__instance, SpawnMonsterAction.class, "used");
-            if (!used && AbstractDungeon.getCurrRoom().event instanceof BeastsLairEvent) {
-                AbstractMonster m = ReflectionHacks.getPrivate(__instance, SpawnMonsterAction.class, "m");
-                if (!isSlimebossSpawn(m)) {
-                    m.maxHealth = (int) (m.maxHealth * 1.25f);
-                    m.currentHealth = (int) (m.currentHealth * 1.25f);
-                }
-                AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, null, new ArtifactPower(m, 2), 2));
-                AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(m, null, new FuryPower(m, 10), 10));
-            }
-        }
-
-        private static boolean isSlimebossSpawn(AbstractMonster m) {
-            return (AbstractDungeon.lastCombatMetricKey.equals("Slime Boss") && slimes.contains(m.id));
-        }
-
-        private static final ArrayList<String> slimes = new ArrayList<>(Arrays.asList(SpikeSlime_L.ID, SpikeSlime_M.ID,
-                SpikeSlime_S.ID, AcidSlime_L.ID, AcidSlime_M.ID, AcidSlime_S.ID));
-
-
-        private static class Locator extends SpireInsertLocator {
-            @Override
-            public int[] Locate(CtBehavior ctMethodToPatch) throws Exception {
-                Matcher finalMatcher = new Matcher.MethodCallMatcher(AbstractMonster.class, "showHealthBar");
-                return LineFinder.findInOrder(ctMethodToPatch, finalMatcher);
-            }
-        }
-    }
 }

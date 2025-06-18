@@ -16,7 +16,6 @@ import basemod.patches.com.megacrit.cardcrawl.screens.options.DropdownMenu.Dropd
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.mod.stslib.Keyword;
@@ -61,10 +60,7 @@ import spireMapOverhaul.rewards.HealReward;
 import spireMapOverhaul.rewards.SingleCardReward;
 import spireMapOverhaul.ui.*;
 import spireMapOverhaul.ui.FixedModLabeledToggleButton.FixedModLabeledToggleButton;
-import spireMapOverhaul.util.QueueZoneCommand;
-import spireMapOverhaul.util.TexLoader;
-import spireMapOverhaul.util.Wiz;
-import spireMapOverhaul.util.ZoneShapeMaker;
+import spireMapOverhaul.util.*;
 import spireMapOverhaul.zoneInterfaces.CampfireModifyingZone;
 import spireMapOverhaul.zoneInterfaces.EncounterModifyingZone;
 import spireMapOverhaul.zoneInterfaces.ModifiedEventRateZone;
@@ -300,6 +296,7 @@ public class SpireAnniversary6Mod implements
         ConsoleCommand.addCommand("addzone", QueueZoneCommand.class);
         ConsoleCommand.addCommand("setdivinity", SetDivinityCommand.class);
         ConsoleCommand.addCommand("clearsetdivinity", ClearSetDivinityCommand.class);
+        ConsoleCommand.addCommand("filterbiome", FilterBiomesCommand.class);
         TextCodeInterpreter.addAccessible(ZoneShapeMaker.class);
     }
 
@@ -1018,7 +1015,7 @@ public class SpireAnniversary6Mod implements
         }
     }
 
-    private static void setFilterConfig(String zoneId, boolean enable) {
+    public static void setFilterConfig(String zoneId, boolean enable) {
         if (modConfig != null) {
             modConfig.setBool(zoneId + "_ENABLED", enable);
             try {

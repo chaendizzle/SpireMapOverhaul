@@ -60,7 +60,7 @@ public class Peddler extends CustomMonster {
     private int payupDamage;
     private int rummageBlock;
 
-    private int move = 1;
+    private int aiMove = 1;
 
     public ArrayList<AbstractCard> wares = new ArrayList<AbstractCard>();
 
@@ -189,7 +189,7 @@ public class Peddler extends CustomMonster {
 
     @Override
     protected void getMove(final int num) {
-        switch (move){
+        switch (aiMove){
             case 1:
                 this.setMove(FREE_SAMPLES, Intent.UNKNOWN);
                 break;
@@ -206,9 +206,9 @@ public class Peddler extends CustomMonster {
                 this.setMove(ESCAPE, Intent.ESCAPE);
                 break;
         }
-        move++;
-        if (move > 4){
-            move = 1;
+        aiMove++;
+        if (aiMove > 4){
+            aiMove = 1;
         }
     }
 }

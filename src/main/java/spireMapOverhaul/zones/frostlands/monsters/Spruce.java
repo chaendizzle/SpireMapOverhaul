@@ -24,7 +24,7 @@ public class Spruce extends CustomMonster
     public static final String NAME = monsterStrings.NAME;
     public static final String[] MOVES = monsterStrings.MOVES;
     private static final String IMG = SpireAnniversary6Mod.makeImagePath("monsters/Frostlands/Spruce.png");
-    public int move = 0;
+    public int aiMove = 0;
     private static final byte FIRST_MOVE = 0, PRIMARY = 1, SECONDARY = 2;
     private static final int HP = 35, DMG = 12;
 
@@ -48,7 +48,7 @@ public class Spruce extends CustomMonster
         setHp(hp, hp+10);
         damage.add(new DamageInfo(this, dmg));
         damage.add(new DamageInfo(this, (int)(.67f * dmg)));
-        move = AbstractDungeon.aiRng.random(1, 2);
+        aiMove = AbstractDungeon.aiRng.random(1, 2);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class Spruce extends CustomMonster
 
     @Override
     public void takeTurn() {
-        switch (move)
+        switch (aiMove)
         {
             case 1:
                 Wiz.atb(new AnimateSlowAttackAction(this));
@@ -73,17 +73,17 @@ public class Spruce extends CustomMonster
                 //Speech bubble
         }
 
-        move++;
+        aiMove++;
         Wiz.atb(new RollMoveAction(this));
     }
 
     @Override
     protected void getMove(final int num) {
-        while(move > 2)
-            move -= 2;
-        if(move < 0)
-            move = 0;
-        switch (move)
+        while(aiMove > 2)
+            aiMove -= 2;
+        if(aiMove < 0)
+            aiMove = 0;
+        switch (aiMove)
         {
             case 1:
                 setMove(MOVES[1], PRIMARY, Intent.ATTACK, damage.get(0).base);

@@ -3,7 +3,8 @@ package spireMapOverhaul.zones.frostlands.events;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
-import com.megacrit.cardcrawl.events.AbstractImageEvent;
+import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.city.Colosseum;
 import com.megacrit.cardcrawl.localization.EventStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.MonsterGroup;
@@ -17,7 +18,7 @@ import spireMapOverhaul.zones.frostlands.relics.Frostcoal;
 import spireMapOverhaul.zones.frostlands.relics.OldHat;
 import spireMapOverhaul.zones.frostlands.relics.SpruceCharm;
 
-public class SnowmanMafiaEvent extends AbstractImageEvent {
+public class SnowmanMafiaEvent extends Colosseum {
     public static final String ID = SpireAnniversary6Mod.makeID("SnowmanMafiaEvent");
     private static final EventStrings eventStrings = CardCrawlGame.languagePack.getEventString(ID);
     public static final String NAME = eventStrings.NAME;
@@ -34,7 +35,15 @@ public class SnowmanMafiaEvent extends AbstractImageEvent {
     }
 
     public SnowmanMafiaEvent() {
-        super(NAME, DESCRIPTIONS[0], IMG);
+        super();
+        this.imageEventText.clear();
+        this.roomEventText.clear();
+        this.title = NAME;
+        this.body = DESCRIPTIONS[0];
+        this.imageEventText.loadImage(IMG);
+        type = AbstractEvent.EventType.IMAGE;
+        this.noCardsInRewards = false;
+
         imageEventText.setDialogOption(OPTIONS[0]);
         imageEventText.updateDialogOption(1, OPTIONS[1]);
         usedContraption = false;

@@ -24,7 +24,7 @@ public class Cole extends CustomMonster
     public static final String NAME = monsterStrings.NAME;
     public static final String[] MOVES = monsterStrings.MOVES;
     private static final String IMG = SpireAnniversary6Mod.makeImagePath("monsters/Frostlands/Cole.png");
-    public int move = 0, buff = 0, blk = 0;
+    public int aiMove = 0, buff = 0, blk = 0;
     private static final byte FIRST_MOVE = 0, PRIMARY = 1, SECONDARY = 2;
     private static final int HP = 30, BLK = 10;
 
@@ -50,7 +50,7 @@ public class Cole extends CustomMonster
             blk += 2;
         }
         setHp(hp, hp+10);
-        move = AbstractDungeon.aiRng.random(1, 2);
+        aiMove = AbstractDungeon.aiRng.random(1, 2);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class Cole extends CustomMonster
 
     @Override
     public void takeTurn() {
-        switch (move)
+        switch (aiMove)
         {
             case 1:
                 for (AbstractMonster m: AbstractDungeon.getMonsters().monsters) {
@@ -77,17 +77,17 @@ public class Cole extends CustomMonster
                 //Speech bubble
         }
 
-        move++;
+        aiMove++;
         Wiz.atb(new RollMoveAction(this));
     }
 
     @Override
     protected void getMove(final int num) {
-        while(move > 2)
-            move -= 2;
-        if(move < 0)
-            move = 0;
-        switch (move)
+        while(aiMove > 2)
+            aiMove -= 2;
+        if(aiMove < 0)
+            aiMove = 0;
+        switch (aiMove)
         {
             case 1:
                 setMove(MOVES[1], PRIMARY, Intent.DEFEND);
